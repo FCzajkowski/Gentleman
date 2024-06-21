@@ -56,8 +56,8 @@ class TextEditor:
         self.text_area.tag_configure("keyword1", foreground="dark orange")
         self.text_area.tag_configure("keyword2", foreground="hot pink")
         self.text_area.tag_configure("keyword3", foreground="medium orchid")
-        self.text_area.tag_configure("keyword4", foreground="sky blue")
-        self.text_area.tag_configure("keyword5", foreground="green2")
+        self.text_area.tag_configure("keyword4", foreground="Sky Blue")
+        self.text_area.tag_configure("keyword5", foreground="DeepSkyBlue3")
         self.text_area.tag_configure("keyword6", foreground="brown1")
     def about(self):
         webbrowser.open("https://github.com/FCzajkowski")
@@ -71,7 +71,7 @@ class TextEditor:
             new_fg = "#16161d"
         else:
             new_bg = "#16161d"
-            new_fg = "#EEE"
+            new_fg = "#ccccff"
             y = 0
 
         self.text_area.config(background=new_bg, foreground=new_fg)
@@ -174,14 +174,14 @@ class TextEditor:
         self.text_area.tag_remove("keyword4", "1.0", tk.END)
         self.text_area.tag_remove("keyword5", "1.0", tk.END)
         self.text_area.tag_remove("keyword6", "1.0", tk.END)
-
-        keywords1 = ["import", "if", "else", "elif", "for", "while", "try", "except", "finally", "with", "as", "pass",
+        
+        keywords1 = ["use", "while", "try", "except", "finally", "with", "as", "pass",
                      "break", "continue", "yield", "nonlocal", "from", "raise"]
         keywords2 = ["def", "class", "return", "lambda", "global"]
-        keywords3 = ["if", "else", "for", "while", "range"]
+        keywords3 = ["if","elif", "else", "for", "while", "range"]
         keywords4 = ["str", "int", "float", "complex", "bool", "bytes", "bytearray", "memoryview", "NoneType", "list",
-                     "dict", "tuple", "self", "print", "printf", "println", ]
-        keywords5 = ['True', 'False', 'None', '__init__']
+                     "dict", "tuple", "self", "console.write", "VAR"]
+        keywords5 = ['True', 'False', 'None', '__init__', "__repr__", "__str__", ""]
         keywords6 = ["index", "insert", "mro", "pop", "copy", "append", "clear", "count", "extend", "remove", "reverse",
                      "sort"]
 
