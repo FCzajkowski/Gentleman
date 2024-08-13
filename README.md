@@ -1,4 +1,4 @@
-# Terminal++ (^_~)
+# Gentleman (^_~)
 ###             📝 Text Editor for Python & Gentle: 
 #### Terminal++ is a specialized text editor designed specifically for use with Gentle & Python, providing a seamless environment for editing transcripts and scripts related to speech and audio analysis tasks.
 
