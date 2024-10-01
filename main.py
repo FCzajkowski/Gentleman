@@ -1,20 +1,16 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, colorchooser
 import re
 import webbrowser
+import json  # Import JSON module for settings
 
+# List of fonts and colors
 font_list = [
-    "Arial",
-    "Comic Sans MS",
-    "Consolas",
-    "Courier",
-    "Georgia",
-    "Helvetica",
-    "Lucida Console",
-    "System",
-    "Times New Roman",
-    "Verdana",
+    "Arial", "Comic Sans MS", "Consolas", "Courier", "Georgia",
+    "Helvetica", "Lucida Console", "System", "Times New Roman", "Verdana",
 ]
+default_color_list = ["dark orange", "hot pink", "medium orchid", "Sky Blue", "DeepSkyBlue3", "brown1"]
+
 x = 0
 y = 0
 
@@ -32,7 +28,7 @@ class TextEditor:
     def __init__(self, root):
         self.root = root
         self.root.title("GentleMan")
-        self.root.geometry("800x800")
+        self.root.geometry("1400x800")
 
         self.text_area = tk.Text(self.root, wrap='word', undo=True)
         self.text_area.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
@@ -41,35 +37,72 @@ class TextEditor:
         self.text_area.bind('<KeyRelease>', self.highlight_keywords)
 
         self.font_index = 0
+        self.current_colors = default_color_list[:]  # Use default colors initially
+        self.settings_file = "settings.json"
+
+        # Load color settings from the settings file
+        self.load_color_settings()
+
         self.bind_shortcuts()
         self.setup_menu()
         self.set_icon()
         self.change_theme()
-
         self.update_font()
 
-        self.text_area.tag_configure("keyword1", foreground="dark orange")
-        self.text_area.tag_configure("keyword2", foreground="hot pink")
-        self.text_area.tag_configure("keyword3", foreground="medium orchid")
-        self.text_area.tag_configure("keyword4", foreground="Sky Blue")
-        self.text_area.tag_configure("keyword5", foreground="DeepSkyBlue3")
-        self.text_area.tag_configure("keyword6", foreground="brown1")
+        self.update_highlight_colors()
 
-    def show_error(self, message):
-        print(f"Error: {message}")
-        messagebox.showerror("Error", message)
+    def load_color_settings(self):
+        """
+        Load color settings from settings.json. If file does not exist, use default colors.
+        """
+        try:
+            with open(self.settings_file, "r") as file:
+                settings = json.load(file)
+                self.current_colors = settings.get("highlight_colors", default_color_list)
+        except (FileNotFoundError, json.JSONDecodeError):
+            # If no settings file or invalid file, keep default colors and create a new settings file
+            self.save_color_settings()
 
-    def exit_editor(self):
-        if messagebox.askokcancel("Quit", "Do you really want to quit?"):
-            self.root.destroy()
+    def save_color_settings(self):
+        """
+        Save current highlight colors to settings.json.
+        """
+        settings = {"highlight_colors": self.current_colors}
+        with open(self.settings_file, "w") as file:
+            json.dump(settings, file, indent=4)
+        print("Color settings saved to settings.json")
 
+    def update_highlight_colors(self):
+        """
+        Assign colors to keyword tags for syntax highlighting.
+        """
+        self.text_area.tag_configure("keyword1", foreground=self.current_colors[0])
+        self.text_area.tag_configure("keyword2", foreground=self.current_colors[1])
+        self.text_area.tag_configure("keyword3", foreground=self.current_colors[2])
+        self.text_area.tag_configure("keyword4", foreground=self.current_colors[3])
+        self.text_area.tag_configure("keyword5", foreground=self.current_colors[4])
+        self.text_area.tag_configure("keyword6", foreground=self.current_colors[5])
+
+    def change_color(self, index):
+        """
+        Change the highlight color for the specified keyword set (index).
+        """
+        new_color = colorchooser.askcolor(title="Choose color")[1]
+        if new_color:
+            self.current_colors[index] = new_color
+            self.update_highlight_colors()  # Update the highlighting with the new color
+            self.save_color_settings()  # Save updated colors to settings.json
+    def exit_editor(self, event=None):
+        """This method exits the editor."""
+        if messagebox.askyesno("Exit", "Are you sure you want to exit?"):
+            self.root.quit()
     def bind_shortcuts(self):
         self.root.bind('<Control-n>', self.new_file)
         self.root.bind('<Control-o>', self.open_file)
         self.root.bind('<Control-s>', self.save_file)
         self.root.bind('<Control-Shift-S>', self.save_as_file)
         self.root.bind('<Control-q>', self.exit_editor)
-        self.root.bind('<Control-f>', self.change_font_menu)  # Changed to open font menu
+        self.root.bind('<Control-f>', self.change_font_menu)
         self.root.bind('<Control-t>', self.change_theme)
         self.root.bind('<Control-h>', self.about)
 
@@ -91,25 +124,41 @@ class TextEditor:
         self.menu_bar.add_cascade(label="   View   ", menu=self.appearance_menu)
         self.appearance_menu.add_command(label="   Change Theme   ", command=self.change_theme)
 
-        # Font Menu inside View (Appearance) Menu
         self.font_menu = tk.Menu(self.appearance_menu, tearoff=0)
         self.appearance_menu.add_cascade(label="   Change Font   ", menu=self.font_menu)
         for font in font_list:
             self.font_menu.add_command(label=font, command=lambda f=font: self.change_font(f))
 
+        self.colors_menu = tk.Menu(self.appearance_menu, tearoff=0)
+        self.appearance_menu.add_cascade(label="   Change HotKeys Colors   ", menu=self.colors_menu)
+        self.refresh_hotkeys_colors_menu()
+
         self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.menu_bar.add_cascade(label="   Help   ", menu=self.help_menu)
         self.help_menu.add_command(label="   Go to Repository (Github)   ", command=self.about)
 
+    def refresh_hotkeys_colors_menu(self):
+        """
+        Refresh the 'Change HotKeys Colors' submenu to reflect current color settings.
+        """
+        self.colors_menu.delete(0, tk.END)  # Clear existing menu items
+        for i, color in enumerate(self.current_colors):
+            self.colors_menu.add_command(
+                label=f"Keyword {i + 1} Color: {color}", 
+                command=lambda i=i: self.change_color(i)
+            )
+
     def update_font(self):
         font_name = font_list[self.font_index]
-        self.text_area.config(font=(font_name, 15))
+        self.text_area.config(font=(font_name, 12))
 
     def set_icon(self):
         try:
             self.root.iconbitmap("logo.png")
         except tk.TclError:
             print("Icon file 'logo.png' not found.")
+    
+
 
     def new_file(self):
         if self.text_area.get("1.0", tk.END) != "\n":
@@ -153,11 +202,11 @@ class TextEditor:
 
     def change_font(self, font_name):
         try:
-            self.text_area.config(font=(font_name, 15))
+            self.text_area.config(font=(font_name, 12))
             print(f"Font changed to {font_name}")
         except Exception as e:
             self.show_error(f"Error changing font: {e}")
-            self.text_area.config(font=("System", 15))  # Fallback to a default font
+            self.text_area.config(font=("System", 12))  # Fallback to a default font
 
     def change_theme(self):
         current_bg = self.text_area.cget("background")
