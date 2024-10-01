@@ -1,6 +1,6 @@
 # Gentleman (^_~)
-###             📝 Text Editor for Python & Gentle: 
-#### Gentleman is a specialized text editor designed specifically for use with Gentle & Python, providing a seamless environment for editing transcripts and scripts related to speech and audio analysis tasks.
+###             📝 Text Editor for Python & RuQL: 
+#### Gentleman is a specialized text editor designed specifically for use with RuQL & Python, providing a seamless environment for editing transcripts and scripts related to speech and audio analysis tasks.
 
 ###             🐍 Written in Python: 
 Gentleman is implemented in Python 🐍, leveraging the language's flexibility and extensive libraries to ensure compatibility and efficient performance with Gentle.
